@@ -42,3 +42,7 @@ provider "cloudinit" {
   # No additional configuration required
 }
 
+resource "azurerm_resource_group" "example" {
+  name     = "${var.labelPrefix}-A05-RG"
+  location = var.region
+}
