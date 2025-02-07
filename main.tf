@@ -123,3 +123,28 @@ data "cloudinit_config" "init" {
     content      = file("${path.module}/init.sh")
   }
 }
+
+resource "azurerm_linux_virtual_machine" "example" {
+  name                = "${var.labelPrefix}-A05-VM"
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
+  size                = "Standard_B1s"
+  admin_username      = var.admin_username
+  admin_ssh_key {
+    username   = var.admin_username
+    public_key = file("/Users/seeratsawhney/Desktop/cst8918-w25-A05-sawh0007/id_rsa.pub")
+  }
+  network_interface_ids = [azurerm_network_interface.example.id]
+  custom_data            = data.cloudinit_config.example.rendered
+  os_disk {
+    name              = "${var.labelPrefix}-A05-VM-Disk"
+    caching           = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "UbuntuServer"
+    sku       = "20.04-LTS"
+    version   = "latest"
+  }
+}
