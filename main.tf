@@ -98,16 +98,19 @@ resource "azurerm_network_security_group" "example" {
   }
 }
 
-resource "azurerm_network_interface" "example" {
-  name                      = "${var.labelPrefix}-A05-NIC"
-  location                  = azurerm_resource_group.example.location
-  resource_group_name       = azurerm_resource_group.example.name
-  virtual_network_name      = azurerm_virtual_network.example.name
-  subnet_id                 = azurerm_subnet.example.id
-  private_ip_address_allocation = "Dynamic"
-  public_ip_address_id      = azurerm_public_ip.example.id
-  network_security_group_id = azurerm_network_security_group.example.id
+resource "azurerm_network_interface" "nic" {
+  name                = "${var.labelPrefix}-nic"
+  location            = azurerm_resource_group.example.location  # Corrected name
+  resource_group_name = azurerm_resource_group.example.name      # Corrected name
+
+  ip_configuration {
+    name                          = "ipconfig1"
+    subnet_id                     = azurerm_subnet.example.id  # Match your subnet name
+    private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.example.id  # Match your public IP name
+  }
 }
+
 
 # Cloud-init configuration for the web server
 data "cloudinit_config" "init" {
