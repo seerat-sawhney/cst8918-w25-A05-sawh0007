@@ -108,3 +108,15 @@ resource "azurerm_network_interface" "example" {
   public_ip_address_id      = azurerm_public_ip.example.id
   network_security_group_id = azurerm_network_security_group.example.id
 }
+
+# Cloud-init configuration for the web server
+data "cloudinit_config" "init" {
+  gzip          = false
+  base64_encode = true
+
+  part {
+    filename     = "init.sh"
+    content_type = "text/x-shellscript"
+    content      = file("${path.module}/init.sh")
+  }
+}
