@@ -7,21 +7,19 @@ variable "labelPrefix" {
 variable "region" {
   description = "Azure region for deployment"
   type        = string
-  default     = "Canada Central"  # You can change this to another region if needed
+  default     = "Canada Central"
 }
 
 variable "admin_username" {
   description = "Admin username for the VM"
   type        = string
-  default     = "seerat"  # Change this to whatever username you want
+  default     = "seerat"
 }
 
-# Configure the Terraform runtime requirements.
 terraform {
   required_version = ">= 1.1.0"
 
   required_providers {
-    # Azure Resource Manager provider and version
     azurerm = {
       source  = "hashicorp/azurerm"
       version = "~> 3.0.2"
@@ -33,14 +31,11 @@ terraform {
   }
 }
 
-# Define providers and their config params
 provider "azurerm" {
-  features {} # Required by AzureRM provider
+  features {}
 }
 
-provider "cloudinit" {
-  # No additional configuration required
-}
+provider "cloudinit" {}
 
 resource "azurerm_resource_group" "example" {
   name     = "${var.labelPrefix}-A05-RG"
@@ -100,17 +95,16 @@ resource "azurerm_network_security_group" "example" {
 
 resource "azurerm_network_interface" "nic" {
   name                = "${var.labelPrefix}-nic"
-  location            = azurerm_resource_group.example.location  # Corrected name
-  resource_group_name = azurerm_resource_group.example.name      # Corrected name
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
 
   ip_configuration {
     name                          = "ipconfig1"
-    subnet_id                     = azurerm_subnet.example.id  # Match your subnet name
+    subnet_id                     = azurerm_subnet.example.id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.example.id  # Match your public IP name
+    public_ip_address_id          = azurerm_public_ip.example.id
   }
 }
-
 
 # Cloud-init configuration for the web server
 data "cloudinit_config" "init" {
@@ -130,17 +124,21 @@ resource "azurerm_linux_virtual_machine" "example" {
   location            = azurerm_resource_group.example.location
   size                = "Standard_B1s"
   admin_username      = var.admin_username
+
   admin_ssh_key {
     username   = var.admin_username
     public_key = file("/Users/seeratsawhney/Desktop/cst8918-w25-A05-sawh0007/id_rsa.pub")
   }
-  network_interface_ids = [azurerm_network_interface.example.id]
-  custom_data            = data.cloudinit_config.example.rendered
+
+  network_interface_ids = [azurerm_network_interface.nic.id]
+  custom_data           = data.cloudinit_config.init.rendered
+
   os_disk {
-    name              = "${var.labelPrefix}-A05-VM-Disk"
-    caching           = "ReadWrite"
+    name                 = "${var.labelPrefix}-A05-VM-Disk"
+    caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
   }
+
   source_image_reference {
     publisher = "Canonical"
     offer     = "UbuntuServer"
