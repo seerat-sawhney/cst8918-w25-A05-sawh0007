@@ -1,18 +1,19 @@
 variable "labelPrefix" {
   description = "Prefix for resource names"
   type        = string
+  default     = "sawh0007"
 }
 
 variable "region" {
   description = "Azure region for deployment"
   type        = string
-  default     = "East US"  # You can change this to another region if needed
+  default     = "Canada Central"  # You can change this to another region if needed
 }
 
 variable "admin_username" {
   description = "Admin username for the VM"
   type        = string
-  default     = "azureadmin"  # Change this to whatever username you want
+  default     = "seerat"  # Change this to whatever username you want
 }
 
 # Configure the Terraform runtime requirements.
@@ -41,7 +42,3 @@ provider "cloudinit" {
   # No additional configuration required
 }
 
-resource "azurerm_resource_group" "example" {
-  name     = "sawh0007-A05-RG"
-  location = var.region
-}
